@@ -64,9 +64,15 @@ void Config::SaveDefault() {
     }
 
     ConfigData defaults;
-
     nlohmann::json j = defaults;
-    out << j.dump(4);
+
+    try {
+        out << j.dump(4);
+    } catch (const nlohmann::json::exception& e) {
+        throw std::runtime_error(
+            "Invalid config " + path_.string() + ": " + e.what()
+        );
+    }
 }
 
 const ConfigData& Config::GetData() const {

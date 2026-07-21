@@ -19,4 +19,6 @@ private:
     AppContext context_;
     CLI::App cli_;
     CommandManager comand_manager_;
+private:
+    void AddComands();
 };

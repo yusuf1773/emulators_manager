@@ -6,12 +6,9 @@
 #include <CLI/CLI.hpp>
 
 #include "../comand/icomand.hpp"
-#include "../app_context/app_context.hpp"
 
 class CommandManager {
 public:
-    CommandManager(AppContext& context);
-
     template<typename Command, typename... Args>
     void AddComand(Args&&... args) {
         commands_.push_back(

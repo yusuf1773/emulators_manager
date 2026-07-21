@@ -22,7 +22,7 @@ public:
     void Add(const T& value) {
         auto values = Load();
         if (std::find(values.begin(), values.end(), value) != values.end()) {
-            return;
+            throw std::runtime_error("Duplicate value to add");
         }
         values.push_back(value);
         Save(values);
@@ -42,10 +42,15 @@ private:
             );
         }
 
-        nlohmann::json json;
-        file >> json;
-
-        return json.get<std::vector<T>>();
+        try {
+            nlohmann::json json;
+            file >> json;
+            return json.get<std::vector<T>>();
+        } catch (const nlohmann::json::exception& e) {
+            throw std::runtime_error(
+                "Invalid repo " + path_.string() + ": " + e.what()
+            );
+        }
     }
 
     void Save(const std::vector<T>& values) const {
@@ -57,7 +62,13 @@ private:
             );
         }
 
-        file << nlohmann::json(values).dump(4);
+        try {
+            file << nlohmann::json(values).dump(4);
+        } catch (const nlohmann::json::exception& e) {
+            throw std::runtime_error(
+                "Invalid repo " + path_.string() + ": " + e.what()
+            );
+        }
     }
 
     void Initialize() const {
