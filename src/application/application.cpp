@@ -1,6 +1,7 @@
 #include "application.hpp"
 
 #include "../comand/add_game_command.hpp"
+#include "../comand/list_games_command.hpp"
 
 Application::Application(std::string name,
     const std::filesystem::path& config_path) :
@@ -13,6 +14,7 @@ Application::Application(std::string name,
 
 void Application::AddComands() {
     comand_manager_.AddComand<AddGameCommand>(context_.GetGameRepo());
+    comand_manager_.AddComand<ListGamesCommand>(context_.GetGameRepo());
 }
 
 void Application::Run(int argc, char** argv) {
