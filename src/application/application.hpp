@@ -1,12 +1,14 @@
 #pragma once
 
 #include <filesystem>
+#include <memory>
 
 #include <CLI/CLI.hpp>
 
 #include "../app_config/config.hpp"
 #include "../app_context/app_context.hpp"
 #include "../comand_manager/comand_manager.hpp"
+#include "../launch_strategy/launch_strategy_manager.hpp"
 
 class Application {
 public:
@@ -18,7 +20,9 @@ public:
 private:
     AppContext context_;
     CLI::App cli_;
-    CommandManager comand_manager_;
+    CommandManager command_manager_;
+    LaunchStrategyManager launch_strategies_;
 private:
     void AddComands();
+    void AddLaunchStrategies();
 };

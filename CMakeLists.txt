@@ -34,13 +34,13 @@ add_executable(emu_manager
     src/main.cpp
 )
 
-target_link_libraries(emu_manager PUBLIC 
-    CLI11::CLI11
-    nlohmann_json::nlohmann_json
-    strategy
-    comands
-    config
-    app_context
-    comand_manager
+target_link_libraries(emu_manager PUBLIC
     application
+    comand_manager
+    app_context
+    config
+    comands
+    strategy
+    nlohmann_json::nlohmann_json
+    CLI11::CLI11
 )

@@ -7,4 +7,5 @@
 class DirectLaunchStrategy : public ILaunchStrategy {
 public:
     void Run(const LaunchRequest& request) const override;
+    LaunchStrategyInfo Info() const override;
 };

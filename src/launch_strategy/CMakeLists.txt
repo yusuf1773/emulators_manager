@@ -1,5 +1,6 @@
 add_library(strategy
     direct_strategy.cpp
+    launch_strategy_manager.cpp
 )
 
 target_include_directories(strategy PUBLIC

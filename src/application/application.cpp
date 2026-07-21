@@ -2,25 +2,35 @@
 
 #include "../comand/add_game_command.hpp"
 #include "../comand/list_games_command.hpp"
+#include "../comand/add_emu_command.hpp"
+#include "../comand/list_launch_stategies_command.h"
+#include "../launch_strategy/direct_strategy.hpp"
 
 Application::Application(std::string name,
-    const std::filesystem::path& config_path) :
+                         const std::filesystem::path& config_path) :
     cli_{std::move(name)}, context_{Config{config_path}.GetData()} {
 
     AddComands();
+    AddLaunchStrategies();
 
-    comand_manager_.Register(cli_);
+    command_manager_.Register(cli_);
 }
 
 void Application::AddComands() {
-    comand_manager_.AddComand<AddGameCommand>(context_.GetGameRepo());
-    comand_manager_.AddComand<ListGamesCommand>(context_.GetGameRepo());
+    command_manager_.AddComand<AddGameCommand>(context_.GetGameRepo());
+    command_manager_.AddComand<ListGamesCommand>(context_.GetGameRepo());
+    command_manager_.AddComand<ListLaunchStragiesCommand>(launch_strategies_);
+    command_manager_.AddComand<AddEmulatorCommand>(context_.GetEmulatorsRepo());
+}
+
+void Application::AddLaunchStrategies() {
+    launch_strategies_.Add<DirectLaunchStrategy>();
 }
 
 void Application::Run(int argc, char** argv) {
     try {
         cli_.parse(argc, argv);
-        comand_manager_.RunSelected();
+        command_manager_.RunSelected();
     } catch (const CLI::ParseError& e) {
         cli_.exit(e);
     }

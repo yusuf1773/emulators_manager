@@ -30,3 +30,11 @@ void DirectLaunchStrategy::Run(const LaunchRequest& request) const {
         );
     }
 }
+
+LaunchStrategyInfo DirectLaunchStrategy::Info() const {
+    return {
+        "direct",
+        "Direct",
+        "Launches the emulator executable directly."
+    };
+}
