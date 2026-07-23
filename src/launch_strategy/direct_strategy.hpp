@@ -2,10 +2,10 @@
 
 #include "istrategy.hpp"
 
-#include "../launch_request/launch_request.hpp"
+#include "launch_context.hpp"
 
 class DirectLaunchStrategy : public ILaunchStrategy {
 public:
-    void Run(const LaunchRequest& request) const override;
+    void Launch(const LaunchContext& request) const override;
     LaunchStrategyInfo Info() const override;
 };

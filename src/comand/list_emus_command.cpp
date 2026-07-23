@@ -4,7 +4,7 @@
 
 #include "../table_print/table.hpp"
 
-ListEmulatorsCommand::ListEmulatorsCommand(GameRepository<Emulator>& emu_repo) :
+ListEmulatorsCommand::ListEmulatorsCommand(const GameRepository<Emulator>& emu_repo) :
     emu_repo_(emu_repo) {}
 
 bool ListEmulatorsCommand::IsSelected() const {

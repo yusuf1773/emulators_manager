@@ -4,7 +4,7 @@
 
 #include "../table_print/table.hpp"
 
-ListGamesCommand::ListGamesCommand(GameRepository<Game>& game_repo) :
+ListGamesCommand::ListGamesCommand(const GameRepository<Game>& game_repo) :
     game_repo_(game_repo) {}
 
 bool ListGamesCommand::IsSelected() const {

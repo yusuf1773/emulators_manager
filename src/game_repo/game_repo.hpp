@@ -4,14 +4,13 @@
 #include <vector>
 #include <fstream>
 
-#include "../game/game.hpp"
-
+#include <nlohmann/json.hpp>
 
 template <typename T>
 class GameRepository {
 public:
-    explicit GameRepository(std::filesystem::path path)
-        : path_(std::move(path)) {
+    explicit GameRepository(std::filesystem::path path, std::function<const std::string&(const T&)> getter)
+        : path_(std::move(path)), getter_(std::move(getter)) {
         Initialize();
     }
 
@@ -26,6 +25,29 @@ public:
         }
         values.push_back(value);
         Save(values);
+    }
+
+    void RemoveByName(const std::string& name) {
+        auto values = Load();
+        auto it = std::find_if(values.begin(), values.end(), [&] (const T& el) {
+            return getter_(el) == name;
+        });
+        if (it == values.end()) {
+            throw std::runtime_error("Not found in repository " + name);
+        }
+        values.erase(it);
+        Save(values);
+    }
+
+    T GetById(const std::string& name) const {
+        auto values = Load();
+        auto it = std::find_if(values.begin(), values.end(), [&] (const T& el) {
+            return getter_(el) == name;
+        });
+        if (it == values.end()) {
+            throw std::runtime_error("Not found in repository " + name);
+        }
+        return *it;
     }
 
 private:
@@ -83,4 +105,5 @@ private:
     }
 private:
     std::filesystem::path path_;
+    std::function<const std::string&(const T&)> getter_;
 };

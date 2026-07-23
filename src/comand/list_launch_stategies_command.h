@@ -7,11 +7,11 @@
 
 class ListLaunchStragiesCommand : public ICommand {
 public:
-    ListLaunchStragiesCommand(LaunchStrategyManager& strategy_manager);
+    ListLaunchStragiesCommand(const LaunchStrategyManager& strategy_manager);
     void Execute() override;
     void Register(CLI::App &app) override;
     bool IsSelected() const override;
 private:
-    LaunchStrategyManager& stragies_manager_;
+    const LaunchStrategyManager& stragies_manager_;
     CLI::App* command_ = nullptr;
 };

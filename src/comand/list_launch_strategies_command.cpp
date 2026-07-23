@@ -3,7 +3,7 @@
 #include <ranges>
 #include "../table_print/table.hpp"
 
-ListLaunchStragiesCommand::ListLaunchStragiesCommand(LaunchStrategyManager& strategy_manager) :
+ListLaunchStragiesCommand::ListLaunchStragiesCommand(const LaunchStrategyManager& strategy_manager) :
     stragies_manager_(strategy_manager) {}
 
 bool ListLaunchStragiesCommand::IsSelected() const {

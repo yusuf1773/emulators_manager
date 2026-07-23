@@ -4,6 +4,7 @@ add_library(comands
         add_emu_command.cpp
         list_launch_strategies_command.cpp
         list_emus_command.cpp
+        launch_game_command.cpp
 )
 
 target_link_libraries(comands PRIVATE 

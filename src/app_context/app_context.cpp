@@ -2,8 +2,12 @@
 
 AppContext::AppContext(ConfigData config) :
     config_data_(std::move(config)),
-    game_repo_(config_data_.games_path),
-    emu_repo_(config_data_.emulators_path) {}
+    game_repo_(config_data_.games_path,
+        [] (const Game& game) -> const std::string& { return game.name; }
+    ),
+    emu_repo_(config_data_.emulators_path,
+        [] (const Emulator& emu) -> const std::string& { return emu.name; }
+    ) {}
 
 GameRepository<Game>& AppContext::GetGameRepo() {
     return game_repo_;

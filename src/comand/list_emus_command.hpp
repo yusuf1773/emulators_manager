@@ -8,11 +8,11 @@
 
 class ListEmulatorsCommand : public ICommand {
 public:
-    ListEmulatorsCommand(GameRepository<Emulator>& emu_repo);
+    ListEmulatorsCommand(const GameRepository<Emulator>& emu_repo);
     void Execute() override;
     void Register(CLI::App& app) override;
     bool IsSelected() const override;
 private:
-    GameRepository<Emulator>& emu_repo_;
+    const GameRepository<Emulator>& emu_repo_;
     CLI::App* command_ = nullptr;
 };

@@ -5,14 +5,19 @@
 #include <stdexcept>
 #include <string>
 
-void DirectLaunchStrategy::Run(const LaunchRequest& request) const {
-    if (request.path.empty()) {
+void DirectLaunchStrategy::Launch(const LaunchContext& request) const {
+    auto& emu_path = request.emu.path;
+    auto& emu_args = request.emu.args;
+    auto& game_path = request.game.path;
+    if (emu_path.empty()) {
         throw std::invalid_argument("Executable path is empty");
     }
 
-    std::string command = "\"\"" + request.path.string() + "\"";
+    std::string command = "\"\"" + emu_path.string() + "\"";
 
-    for (const auto& arg : request.args) {
+    command += " \"" + game_path.string() + "\"";
+
+    for (const auto& arg : emu_args) {
         command += " \"" + arg + "\"";
     }
 

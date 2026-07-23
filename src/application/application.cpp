@@ -5,6 +5,7 @@
 #include "../comand/add_emu_command.hpp"
 #include "../comand/list_launch_stategies_command.h"
 #include "../comand/list_emus_command.hpp"
+#include "../comand/launch_game_command.hpp"
 
 #include "../launch_strategy/direct_strategy.hpp"
 
@@ -25,6 +26,11 @@ void Application::AddComands() {
     command_manager_.AddComand<ListLaunchStragiesCommand>(launch_strategies_);
     command_manager_.AddComand<AddEmulatorCommand>(context_.GetEmulatorsRepo());
     command_manager_.AddComand<ListEmulatorsCommand>(context_.GetEmulatorsRepo());
+    command_manager_.AddComand<LaunchGameCommand>(
+        context_.GetGameRepo(),
+        context_.GetEmulatorsRepo(),
+        launch_strategies_
+    );
 }
 
 void Application::AddLaunchStrategies() {

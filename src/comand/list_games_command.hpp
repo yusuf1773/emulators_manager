@@ -8,11 +8,11 @@
 
 class ListGamesCommand : public ICommand {
 public:
-    ListGamesCommand(GameRepository<Game>& game_repo);
+    ListGamesCommand(const GameRepository<Game>& game_repo);
     void Register(CLI::App &app) override;
     void Execute() override;
     bool IsSelected() const override;
 private:
-    GameRepository<Game>& game_repo_;
+    const GameRepository<Game>& game_repo_;
     CLI::App* command_ = nullptr;
 };
