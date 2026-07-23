@@ -1,5 +1,8 @@
 #include "list_launch_stategies_command.h"
 
+#include <ranges>
+#include "../table_print/table.hpp"
+
 ListLaunchStragiesCommand::ListLaunchStragiesCommand(LaunchStrategyManager& strategy_manager) :
     stragies_manager_(strategy_manager) {}
 
@@ -21,8 +24,21 @@ void ListLaunchStragiesCommand::Execute() {
         std::cout << "Not found strategies\n";
     }
 
-    for (auto& strategy : strategies) {
-        const auto& info = strategy->Info();
-        std::cout << info.id << ' ' << info.name << ' ' << info.description << '\n';
-    }
+    auto infos_views = strategies | std::views::transform(
+        [] (const std::unique_ptr<ILaunchStrategy>& strategy) {
+            return strategy->Info();
+        }
+    );
+
+    std::vector<LaunchStrategyInfo> infos(infos_views.begin(), infos_views.end());
+    Table<LaunchStrategyInfo> table_infos(
+        {
+            {"Id", [] (const LaunchStrategyInfo& info) { return std::string(info.id); } },
+            {"Name", [] (const LaunchStrategyInfo& info) { return std::string(info.name); } },
+            {"Description", [] (const LaunchStrategyInfo& info) { return std::string(info.description); } }
+        }  
+    );
+
+    table_infos.print(infos);
+    
 }
