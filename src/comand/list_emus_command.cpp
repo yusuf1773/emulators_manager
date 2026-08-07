@@ -2,14 +2,12 @@
 
 #include <ranges>
 
+#include <CLI/App.hpp>
+
 #include "../table_print/table.hpp"
 
 ListEmulatorsCommand::ListEmulatorsCommand(const GameRepository<Emulator>& emu_repo) :
     emu_repo_(emu_repo) {}
-
-bool ListEmulatorsCommand::IsSelected() const {
-    return command_ != nullptr && command_->parsed();
-}
 
 void ListEmulatorsCommand::Register(CLI::App& app) {
     command_ = app.add_subcommand("list-emu", "Emulators list");

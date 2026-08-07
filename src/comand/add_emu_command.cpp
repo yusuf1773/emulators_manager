@@ -1,14 +1,14 @@
 #include "add_emu_command.hpp"
 
+#include <CLI/App.hpp>
+
 AddEmulatorCommand::AddEmulatorCommand(GameRepository<Emulator>& emu_repo) :
     emu_repo_(emu_repo) {}
 
-bool AddEmulatorCommand::IsSelected() const {
-    return command_ != nullptr && command_->parsed();
-}
-
 void AddEmulatorCommand::Execute() {
-    emu_repo_.Add(Emulator{name, path, platform, launch_strategy_id, args});
+    emu_repo_.Add(Emulator{
+        std::move(name), std::move(path), std::move(platform), std::move(launch_strategy_id), std::move(args)
+    }, allow_replace_);
 }
 
 void AddEmulatorCommand::Register(CLI::App& app) {
@@ -34,4 +34,6 @@ void AddEmulatorCommand::Register(CLI::App& app) {
     command_->add_option(
         "--arg", args, "Emulator extra args"
     );
+
+    command_->add_flag("--repl", allow_replace_, "Allow replace element if already exist");
 }

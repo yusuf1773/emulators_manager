@@ -1,5 +1,7 @@
 #include "comand_manager.hpp"
 
+#include <CLI/App.hpp>
+
 void CommandManager::Register(CLI::App& cli) const {
     for (auto& command : commands_) {
         command->Register(cli);

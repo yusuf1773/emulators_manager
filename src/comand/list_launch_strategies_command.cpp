@@ -1,14 +1,13 @@
-#include "list_launch_stategies_command.h"
+#include "list_launch_stategies_command.hpp"
 
 #include <ranges>
+
+#include <CLI/App.hpp>
+
 #include "../table_print/table.hpp"
 
 ListLaunchStragiesCommand::ListLaunchStragiesCommand(const LaunchStrategyManager& strategy_manager) :
     stragies_manager_(strategy_manager) {}
-
-bool ListLaunchStragiesCommand::IsSelected() const {
-    return command_ != nullptr && command_->parsed();
-}
 
 void ListLaunchStragiesCommand::Register(CLI::App& app) {
     command_ = app.add_subcommand(

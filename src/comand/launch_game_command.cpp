@@ -1,16 +1,14 @@
 #include "launch_game_command.hpp"
 
+#include <CLI/App.hpp>
+
 #include "../launch_strategy/istrategy.hpp"
 
 LaunchGameCommand::LaunchGameCommand(const GameRepository<Game>& games_repo,
     const GameRepository<Emulator>& emus_repo,
     const LaunchStrategyManager& launch_manager) :
     games_repo_(games_repo), emus_repo_(emus_repo), launch_manager_(launch_manager) {}
-
-bool LaunchGameCommand::IsSelected() const {
-    return command_ != nullptr && command_->parsed();
-}
-
+    
 void LaunchGameCommand::Register(CLI::App& app) {
     command_ = app.add_subcommand("launch", "Launch game");
 

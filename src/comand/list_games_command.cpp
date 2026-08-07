@@ -1,15 +1,13 @@
 #include <iostream>
 
+#include <CLI/App.hpp>
+
 #include "list_games_command.hpp"
 
 #include "../table_print/table.hpp"
 
 ListGamesCommand::ListGamesCommand(const GameRepository<Game>& game_repo) :
     game_repo_(game_repo) {}
-
-bool ListGamesCommand::IsSelected() const {
-    return command_ != nullptr && command_->parsed();
-}
 
 void ListGamesCommand::Register(CLI::App& app) {
     command_ = app.add_subcommand("list-game",

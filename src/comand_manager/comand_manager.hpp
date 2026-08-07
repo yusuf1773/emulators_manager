@@ -4,9 +4,11 @@
 #include <memory>
 #include <vector>
 
-#include <CLI/CLI.hpp>
-
 #include "../comand/icomand.hpp"
+
+namespace CLI {
+    class App;
+}
 
 class CommandManager {
 public:

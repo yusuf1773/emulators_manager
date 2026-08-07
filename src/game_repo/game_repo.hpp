@@ -18,13 +18,22 @@ public:
         return Load();
     }
 
-    void Add(const T& value) {
+    void Add(const T& value, bool allow_replace = false) {
         auto values = Load();
-        if (std::find(values.begin(), values.end(), value) != values.end()) {
-            throw std::runtime_error("Duplicate value to add");
+        const std::string name = getter_(value);
+        auto it = std::find_if(values.begin(), values.end(), [&] (const T& el) {
+            return getter_(el) == name;
+        });
+        if (it != values.end()) {
+            if (!allow_replace) {
+                throw std::runtime_error("Duplicate value to add");
+            } else {
+                *it = value;
+            }
+        } else {
+            values.push_back(value);
+            Save(values);
         }
-        values.push_back(value);
-        Save(values);
     }
 
     void RemoveByName(const std::string& name) {
