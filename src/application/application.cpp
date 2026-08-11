@@ -8,6 +8,7 @@
 #include "../comand/launch_game_command.hpp"
 #include "../comand/replace_emu_command.hpp"
 #include "../comand/replace_game_command.hpp"
+#include "../comand/list_command_history_command.hpp"
 
 #include "../launch_strategy/direct_strategy.hpp"
 
@@ -35,6 +36,7 @@ void Application::AddComands() {
     );
     command_manager_.AddComand<ReplaceEmuCommand>(context_.GetEmulatorsRepo());
     command_manager_.AddComand<ReplaceGameCommand>(context_.GetGameRepo());
+    command_manager_.AddComand<ListCmdHistoryCommand>(context_.GetCommandsHistoryRepo());
 }
 
 void Application::AddLaunchStrategies() {
@@ -44,6 +46,7 @@ void Application::AddLaunchStrategies() {
 void Application::Run(int argc, char** argv) {
     try {
         cli_.parse(argc, argv);
+        context_.GetCommandsHistoryRepo().Add({argc, argv});
         command_manager_.RunSelected();
     } catch (const CLI::ParseError& e) {
         cli_.exit(e);

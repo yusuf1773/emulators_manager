@@ -7,6 +7,7 @@ add_library(comands
         launch_game_command.cpp
         replace_emu_command.cpp
         replace_game_command.cpp
+        list_command_history_command.cpp
         icommand.cpp
 )
 

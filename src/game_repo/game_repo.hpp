@@ -2,117 +2,60 @@
 
 #include <filesystem>
 #include <vector>
-#include <fstream>
 
-#include <nlohmann/json.hpp>
+#include "constrains.hpp"
+#include "json_storage.hpp"
 
-template <typename T>
+template <typename T, typename Storage = JsonStorage<T>>
+requires IsStorage<Storage, T, std::vector<T>>
 class GameRepository {
 public:
-    explicit GameRepository(std::filesystem::path path, std::function<const std::string&(const T&)> getter)
-        : path_(std::move(path)), getter_(std::move(getter)) {
-        Initialize();
-    }
+    explicit GameRepository(const std::filesystem::path& path, std::function<const std::string&(const T&)> getter)
+        : storage_(path), values_(storage_.Load()), getter_(std::move(getter)) {}
 
-    std::vector<T> GetAll() const {
-        return Load();
+    const std::vector<T>& GetAll() const {
+        return values_;
     }
 
     void Add(const T& value, bool allow_replace = false) {
-        auto values = Load();
         const std::string name = getter_(value);
-        auto it = std::find_if(values.begin(), values.end(), [&] (const T& el) {
+        auto it = std::find_if(values_.begin(), values_.end(), [&] (const T& el) {
             return getter_(el) == name;
         });
-        if (it != values.end()) {
+        if (it != values_.end()) {
             if (!allow_replace) {
                 throw std::runtime_error("Duplicate value to add");
             } else {
                 *it = value;
             }
         } else {
-            values.push_back(value);
-            Save(values);
+            values_.push_back(value);
+            storage_.Save(values_);
         }
     }
 
     void RemoveByName(const std::string& name) {
-        auto values = Load();
-        auto it = std::find_if(values.begin(), values.end(), [&] (const T& el) {
+        auto it = std::find_if(values_.begin(), values_.end(), [&] (const T& el) {
             return getter_(el) == name;
         });
-        if (it == values.end()) {
+        if (it == values_.end()) {
             throw std::runtime_error("Not found in repository " + name);
         }
-        values.erase(it);
-        Save(values);
+        values_.erase(it);
+        storage_.Save(values_);
     }
 
-    T GetById(const std::string& name) const {
-        auto values = Load();
-        auto it = std::find_if(values.begin(), values.end(), [&] (const T& el) {
+    const T& GetById(const std::string& name) const {
+        auto it = std::find_if(values_.begin(), values_.end(), [&] (const T& el) {
             return getter_(el) == name;
         });
-        if (it == values.end()) {
+        if (it == values_.end()) {
             throw std::runtime_error("Not found in repository " + name);
         }
         return *it;
     }
-
 private:
-    std::vector<T> Load() const {
-        if (!std::filesystem::exists(path_)) {
-            return {};
-        }
-
-        std::ifstream file(path_);
-
-        if (!file) {
-            throw std::runtime_error(
-                "Failed to open file: " + path_.string()
-            );
-        }
-
-        try {
-            nlohmann::json json;
-            file >> json;
-            return json.get<std::vector<T>>();
-        } catch (const nlohmann::json::exception& e) {
-            throw std::runtime_error(
-                "Invalid repo " + path_.string() + ": " + e.what()
-            );
-        }
-    }
-
-    void Save(const std::vector<T>& values) const {
-        std::ofstream file(path_, std::ios::trunc);
-
-        if (!file) {
-            throw std::runtime_error(
-                "Failed to open file: " + path_.string()
-            );
-        }
-
-        try {
-            file << nlohmann::json(values).dump(4);
-        } catch (const nlohmann::json::exception& e) {
-            throw std::runtime_error(
-                "Invalid repo " + path_.string() + ": " + e.what()
-            );
-        }
-    }
-
-    void Initialize() const {
-        if (!std::filesystem::exists(path_)) {
-            Save({});
-            return;
-        }
-
-        if (std::filesystem::file_size(path_) == 0) {
-            Save({});
-        }
-    }
-private:
-    std::filesystem::path path_;
+    Storage storage_;
+    std::vector<T> values_;
     std::function<const std::string&(const T&)> getter_;
 };

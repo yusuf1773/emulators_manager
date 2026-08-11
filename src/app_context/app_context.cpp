@@ -7,7 +7,9 @@ AppContext::AppContext(ConfigData config) :
     ),
     emu_repo_(config_data_.emulators_path,
         [] (const Emulator& emu) -> const std::string& { return emu.name; }
-    ) {}
+    ),
+    history_repo_(config_data_.history_path, config_data_.history_max_size)
+    {}
 
 GameRepository<Game>& AppContext::GetGameRepo() {
     return game_repo_;
@@ -15,6 +17,10 @@ GameRepository<Game>& AppContext::GetGameRepo() {
 
 GameRepository<Emulator>& AppContext::GetEmulatorsRepo() {
     return emu_repo_;
+}
+
+HistoryRepository<StrLineHistory>& AppContext::GetCommandsHistoryRepo() {
+    return history_repo_;
 }
 
 const ConfigData& AppContext::GetConfig() const {

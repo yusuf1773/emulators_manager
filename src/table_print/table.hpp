@@ -73,29 +73,33 @@ public:
             return;
         }
 
-        std::vector<int> widths(getters_.size(), default_width);
+        std::vector<int> widths(getters_.size() + 1, default_width);
         std::vector<std::vector<std::string>> rows;
 
         if constexpr (std::ranges::sized_range<R>) {
             rows.reserve(std::ranges::size(data));
         }
 
-        for (size_t i = 0; i < getters_.size(); ++i) {
+        for (size_t i = 1; i < getters_.size(); ++i) {
             widths[i] = std::max(
                 default_width,
                 static_cast<int>(getters_[i].first.size())
             );
         }
 
-        for (const auto& item : data) {
+        for (const auto& [item, ind] : std::ranges::views::zip(data, 
+            std::ranges::views::iota(1) | 
+            std::ranges::views::transform([] (int i) { return std::to_string(i); }))) {
             std::vector<std::string> row;
-            row.reserve(getters_.size());
+            row.reserve(getters_.size() + 1);
+            
+            row.push_back(ind);
 
             for (size_t i = 0; i < getters_.size(); ++i) {
                 std::string value = getters_[i].second(item);
 
-                widths[i] = std::max(
-                    widths[i],
+                widths[i + 1] = std::max(
+                    widths[i + 1],
                     static_cast<int>(value.size())
                 );
 
@@ -147,10 +151,14 @@ private:
         const std::vector<int>& widths,
         TableStyle style
     ) const {
+        std::cout << style.vertical << ' '
+                      << std::left
+                      << std::setw(widths[0] - 1)
+                      << "Ind";
         for (size_t i = 0; i < getters_.size(); ++i) {
             std::cout << style.vertical << ' '
                       << std::left
-                      << std::setw(widths[i] - 1)
+                      << std::setw(widths[i + 1] - 1)
                       << getters_[i].first;
         }
 

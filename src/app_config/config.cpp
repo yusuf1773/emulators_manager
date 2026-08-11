@@ -25,6 +25,7 @@ Config::Config(std::filesystem::path path)
 
     data_.emulators_path = ResolvePath(path_, data_.emulators_path);
     data_.games_path = ResolvePath(path_, data_.games_path);
+    data_.history_path = ResolvePath(path_, data_.history_path);
 }
 
 void Config::Load() {
