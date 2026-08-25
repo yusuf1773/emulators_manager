@@ -16,9 +16,9 @@ public:
     
     void Add(History hist) {
         if (histories_.size() >= max_size_) {
-            histories_.pop_front();
+            histories_.pop_back();
         }
-        histories_.push_back(std::move(hist));
+        histories_.push_front(std::move(hist));
         storage_.Save(histories_);
     }
 
