@@ -1,18 +1,38 @@
 #include <QCoreApplication>
+#include <QDebug>
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
+#include <QQmlEngine>
 #include <QString>
 #include <QTimer>
-#include <cstdlib>
+#include <QVariant>
+#include <exception>
+
+#include "gui_app_context.h"
 
 int main(int argc, char* argv[]) {
 	QGuiApplication application(argc, argv);
-	QQmlApplicationEngine engine;
-	engine.loadFromModule("EmuManager", "Main");
-	if (engine.rootObjects().isEmpty()) return EXIT_FAILURE;
-	if (QCoreApplication::arguments().contains(
-			QStringLiteral("--smoke-test"))) {
-		QTimer::singleShot(0, &application, &QCoreApplication::quit);
+	try {
+		emu::GuiAppContext context("config/config.json");
+		QQmlApplicationEngine engine;
+		QQmlEngine::setObjectOwnership(&context.game_list_model(),
+									   QQmlEngine::CppOwnership);
+		QQmlEngine::setObjectOwnership(&context.errors(),
+									   QQmlEngine::CppOwnership);
+		engine.setInitialProperties(
+			{{QStringLiteral("gameListModel"),
+			  QVariant::fromValue(&context.game_list_model())},
+			 {QStringLiteral("errorNotifier"),
+			  QVariant::fromValue(&context.errors())}});
+		engine.loadFromModule("EmuManager", "Main");
+		if (engine.rootObjects().isEmpty()) return 1;
+		if (QCoreApplication::arguments().contains(
+				QStringLiteral("--smoke-test"))) {
+			QTimer::singleShot(0, &application, &QCoreApplication::quit);
+		}
+		return application.exec();
+	} catch (const std::exception& error) {
+		qCritical().noquote() << error.what();
+		return 1;
 	}
-	return application.exec();
 }

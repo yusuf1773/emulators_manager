@@ -32,7 +32,12 @@ private:
 
 class MemoryGameRepository final : public GameRepository {
 public:
-	Result<std::vector<Game>> FindAll() const override { return values; }
+	Result<std::vector<Game>> FindAll() const override {
+		if (find_all_error) {
+			return Failure(ErrorCode::kPersistence, "find all failed");
+		}
+		return values;
+	}
 	Result<std::optional<Game>> FindById(const GameId& id) const override {
 		return Find([&](const Game& game) { return game.id == id; });
 	}
@@ -62,6 +67,7 @@ public:
 	}
 
 	std::vector<Game> values;
+	bool find_all_error = false;
 	bool save_error = false;
 
 private:
