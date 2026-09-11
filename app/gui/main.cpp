@@ -19,8 +19,12 @@ int main(int argc, char* argv[]) {
 									   QQmlEngine::CppOwnership);
 		QQmlEngine::setObjectOwnership(&context.errors(),
 									   QQmlEngine::CppOwnership);
+		QQmlEngine::setObjectOwnership(&context.emulator_list_model(),
+									   QQmlEngine::CppOwnership);
 		engine.setInitialProperties(
-			{{QStringLiteral("gameListModel"),
+			{{QStringLiteral("emulatorListModel"),
+			  QVariant::fromValue(&context.emulator_list_model())},
+			 {QStringLiteral("gameListModel"),
 			  QVariant::fromValue(&context.game_list_model())},
 			 {QStringLiteral("errorNotifier"),
 			  QVariant::fromValue(&context.errors())}});

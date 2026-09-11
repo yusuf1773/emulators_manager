@@ -9,6 +9,8 @@ add_library(emu_gui_adapter STATIC
 	error_notifier.h
 	gui_app_context.cpp
 	gui_app_context.h
+	models/emulator_list_model.cpp
+	models/emulator_list_model.h
 	models/game_list_model.cpp
 	models/game_list_model.h
 )

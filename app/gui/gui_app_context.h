@@ -11,6 +11,7 @@
 #include "emu/persistence/sqlite_database.h"
 #include "emu/persistence/sqlite_repositories.h"
 #include "error_notifier.h"
+#include "models/emulator_list_model.h"
 #include "models/game_list_model.h"
 
 namespace emu {
@@ -20,6 +21,7 @@ public:
 	explicit GuiAppContext(const std::filesystem::path& config_path);
 
 	GameListModel& game_list_model() { return game_list_model_; }
+	EmulatorListModel& emulator_list_model() { return emulator_list_model_; }
 	ErrorNotifier& errors() { return errors_; }
 
 private:
@@ -36,6 +38,7 @@ private:
 	JsonCatalogTransfer catalog_transfer_;
 	ErrorNotifier errors_;
 	GameListModel game_list_model_;
+	EmulatorListModel emulator_list_model_;
 };
 
 }
