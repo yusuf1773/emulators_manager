@@ -1,5 +1,4 @@
-#ifndef EMU_MANAGER_APP_CLI_COMMANDS_LIST_GAMES_COMMAND_H_
-#define EMU_MANAGER_APP_CLI_COMMANDS_LIST_GAMES_COMMAND_H_
+#pragma once
 
 #include "cli/commands/cli_command.h"
 #include "emu/application/repository.h"
@@ -8,15 +7,13 @@
 namespace emu {
 
 class ListGamesCommand : public CliCommand {
- public:
-  explicit ListGamesCommand(const Repository<Game>& game_repo);
-  void Register(CLI::App& app) override;
-  void Execute() override;
+	public:
+	explicit ListGamesCommand(const Repository<Game>& game_repo);
+	void Register(CLI::App& app) override;
+	void Execute() override;
 
- private:
-  const Repository<Game>& game_repo_;
+	private:
+	const Repository<Game>& game_repo_;
 };
 
 }
-
-#endif

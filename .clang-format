@@ -1,2 +1,6 @@
 BasedOnStyle: Google
 FixNamespaceComments: false
+UseTab: Always
+IndentWidth: 4
+TabWidth: 4
+AccessModifierOffset: 0

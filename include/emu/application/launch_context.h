@@ -1,5 +1,4 @@
-#ifndef EMU_MANAGER_INCLUDE_EMU_APPLICATION_LAUNCH_CONTEXT_H_
-#define EMU_MANAGER_INCLUDE_EMU_APPLICATION_LAUNCH_CONTEXT_H_
+#pragma once
 
 #include <filesystem>
 #include <string>
@@ -11,10 +10,8 @@
 namespace emu {
 
 struct LaunchContext {
-  const Emulator& emu;
-  const Game& game;
+	const Emulator& emu;
+	const Game& game;
 };
 
 }
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef EMU_MANAGER_APP_CLI_COMMANDS_REPLACE_GAME_COMMAND_H_
-#define EMU_MANAGER_APP_CLI_COMMANDS_REPLACE_GAME_COMMAND_H_
+#pragma once
 
 #include <filesystem>
 #include <string>
@@ -11,21 +10,19 @@
 namespace emu {
 
 class ReplaceGameCommand : public CliCommand {
- public:
-  explicit ReplaceGameCommand(Repository<Game>& repo);
+	public:
+	explicit ReplaceGameCommand(Repository<Game>& repo);
 
-  void Execute() override;
+	void Execute() override;
 
-  void Register(CLI::App& app) override;
+	void Register(CLI::App& app) override;
 
- private:
-  Repository<Game>& repo_;
-  std::string old_name_;
-  std::string name_;
-  std::filesystem::path path_;
-  std::string platform_;
+	private:
+	Repository<Game>& repo_;
+	std::string old_name_;
+	std::string name_;
+	std::filesystem::path path_;
+	std::string platform_;
 };
 
 }
-
-#endif

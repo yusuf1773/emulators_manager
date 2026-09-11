@@ -1,5 +1,4 @@
-#ifndef EMU_MANAGER_INCLUDE_EMU_PERSISTENCE_JSON_SERIALIZATION_H_
-#define EMU_MANAGER_INCLUDE_EMU_PERSISTENCE_JSON_SERIALIZATION_H_
+#pragma once
 
 #include <chrono>
 
@@ -13,23 +12,21 @@ namespace emu {
 
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Game, name, path, platform)
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Emulator, name, path, platform,
-                                   launch_strategy_id, args)
+								   launch_strategy_id, args)
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(ConfigData, games_path, emulators_path,
-                                   history_path, history_max_size)
+								   history_path, history_max_size)
 
 inline void to_json(nlohmann::json& json, const CommandHistoryEntry& entry) {
-  const auto seconds = std::chrono::duration_cast<std::chrono::seconds>(
-                           entry.timestamp.time_since_epoch())
-                           .count();
-  json = {{"command", entry.command}, {"timestamp", seconds}};
+	const auto seconds = std::chrono::duration_cast<std::chrono::seconds>(
+							 entry.timestamp.time_since_epoch())
+							 .count();
+	json = {{"command", entry.command}, {"timestamp", seconds}};
 }
 
 inline void from_json(const nlohmann::json& json, CommandHistoryEntry& entry) {
-  json.at("command").get_to(entry.command);
-  entry.timestamp = std::chrono::system_clock::time_point(
-      std::chrono::seconds(json.at("timestamp").get<long long>()));
+	json.at("command").get_to(entry.command);
+	entry.timestamp = std::chrono::system_clock::time_point(
+		std::chrono::seconds(json.at("timestamp").get<long long>()));
 }
 
 }
-
-#endif

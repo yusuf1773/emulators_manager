@@ -5,7 +5,7 @@
 namespace emu {
 
 bool CliCommand::IsSelected() const {
-  return command_ != nullptr && command_->parsed();
+	return command_ != nullptr && command_->parsed();
 }
 
 }

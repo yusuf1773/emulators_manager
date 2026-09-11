@@ -1,5 +1,4 @@
-#ifndef EMU_MANAGER_INCLUDE_EMU_PERSISTENCE_CONFIG_H_
-#define EMU_MANAGER_INCLUDE_EMU_PERSISTENCE_CONFIG_H_
+#pragma once
 
 #include <filesystem>
 
@@ -8,19 +7,17 @@
 namespace emu {
 
 class Config {
- public:
-  explicit Config(std::filesystem::path path);
+	public:
+	explicit Config(std::filesystem::path path);
 
-  const ConfigData& GetData() const;
+	const ConfigData& GetData() const;
 
- private:
-  void Load();
-  void SaveDefault();
+	private:
+	void Load();
+	void SaveDefault();
 
-  std::filesystem::path path_;
-  ConfigData data_;
+	std::filesystem::path path_;
+	ConfigData data_;
 };
 
 }
-
-#endif

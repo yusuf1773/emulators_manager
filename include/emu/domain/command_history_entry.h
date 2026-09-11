@@ -1,5 +1,4 @@
-#ifndef EMU_MANAGER_INCLUDE_EMU_DOMAIN_COMMAND_HISTORY_ENTRY_H_
-#define EMU_MANAGER_INCLUDE_EMU_DOMAIN_COMMAND_HISTORY_ENTRY_H_
+#pragma once
 
 #include <chrono>
 #include <string>
@@ -8,19 +7,18 @@
 namespace emu {
 
 struct CommandHistoryEntry {
-  std::string command{};
-  std::chrono::system_clock::time_point timestamp;
+	std::string command{};
+	std::chrono::system_clock::time_point timestamp;
 
-  CommandHistoryEntry() = default;
+	CommandHistoryEntry() = default;
 
-  explicit CommandHistoryEntry(std::string line)
-      : command(std::move(line)), timestamp(std::chrono::system_clock::now()) {}
+	explicit CommandHistoryEntry(std::string line)
+		: command(std::move(line)),
+		  timestamp(std::chrono::system_clock::now()) {}
 
-  CommandHistoryEntry(std::string line,
-                      std::chrono::system_clock::time_point time)
-      : command(std::move(line)), timestamp(time) {}
+	CommandHistoryEntry(std::string line,
+						std::chrono::system_clock::time_point time)
+		: command(std::move(line)), timestamp(time) {}
 };
 
 }
-
-#endif

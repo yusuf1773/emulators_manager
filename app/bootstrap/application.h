@@ -1,5 +1,4 @@
-#ifndef EMU_MANAGER_APP_BOOTSTRAP_APPLICATION_H_
-#define EMU_MANAGER_APP_BOOTSTRAP_APPLICATION_H_
+#pragma once
 
 #include <filesystem>
 #include <memory>
@@ -16,24 +15,22 @@
 namespace emu {
 
 class Application {
- public:
-  Application(std::string name, const std::filesystem::path& config_path);
+	public:
+	Application(std::string name, const std::filesystem::path& config_path);
 
-  int Run(int argc, char** argv);
+	int Run(int argc, char** argv);
 
- private:
-  AppContext context_;
-  CLI::App cli_;
-  CommandManager command_manager_;
-  LaunchStrategyRegistry launch_strategies_;
-  SystemProcessRunner process_runner_;
-  LaunchGameService launch_service_;
+	private:
+	AppContext context_;
+	CLI::App cli_;
+	CommandManager command_manager_;
+	LaunchStrategyRegistry launch_strategies_;
+	SystemProcessRunner process_runner_;
+	LaunchGameService launch_service_;
 
- private:
-  void AddCommands();
-  void AddLaunchStrategies();
+	private:
+	void AddCommands();
+	void AddLaunchStrategies();
 };
 
 }
-
-#endif

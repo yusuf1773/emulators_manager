@@ -1,5 +1,4 @@
-#ifndef EMU_MANAGER_INCLUDE_EMU_APPLICATION_LAUNCH_GAME_SERVICE_H_
-#define EMU_MANAGER_INCLUDE_EMU_APPLICATION_LAUNCH_GAME_SERVICE_H_
+#pragma once
 
 #include <string>
 
@@ -12,22 +11,20 @@
 namespace emu {
 
 class LaunchGameService {
- public:
-  LaunchGameService(const Repository<Game>& games,
-                    const Repository<Emulator>& emulators,
-                    const LaunchStrategyRegistry& strategies,
-                    ProcessRunner& runner);
+	public:
+	LaunchGameService(const Repository<Game>& games,
+					  const Repository<Emulator>& emulators,
+					  const LaunchStrategyRegistry& strategies,
+					  ProcessRunner& runner);
 
-  void Launch(const std::string& game_name,
-              const std::string& emulator_name) const;
+	void Launch(const std::string& game_name,
+				const std::string& emulator_name) const;
 
- private:
-  const Repository<Game>& games_;
-  const Repository<Emulator>& emulators_;
-  const LaunchStrategyRegistry& strategies_;
-  ProcessRunner& runner_;
+	private:
+	const Repository<Game>& games_;
+	const Repository<Emulator>& emulators_;
+	const LaunchStrategyRegistry& strategies_;
+	ProcessRunner& runner_;
 };
 
 }
-
-#endif

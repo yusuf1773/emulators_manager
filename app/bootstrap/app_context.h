@@ -1,5 +1,4 @@
-#ifndef EMU_MANAGER_APP_BOOTSTRAP_APP_CONTEXT_H_
-#define EMU_MANAGER_APP_BOOTSTRAP_APP_CONTEXT_H_
+#pragma once
 
 #include "emu/domain/command_history_entry.h"
 #include "emu/domain/emulator.h"
@@ -11,23 +10,21 @@
 namespace emu {
 
 class AppContext {
- public:
-  explicit AppContext(ConfigData config);
+	public:
+	explicit AppContext(ConfigData config);
 
-  JsonRepository<Game>& GetGameRepo();
-  JsonRepository<Emulator>& GetEmulatorsRepo();
-  JsonHistoryRepository& GetCommandsHistoryRepo();
+	JsonRepository<Game>& GetGameRepo();
+	JsonRepository<Emulator>& GetEmulatorsRepo();
+	JsonHistoryRepository& GetCommandsHistoryRepo();
 
-  const ConfigData& GetConfig() const;
+	const ConfigData& GetConfig() const;
 
- private:
-  ConfigData config_data_;
+	private:
+	ConfigData config_data_;
 
-  JsonRepository<Game> game_repo_;
-  JsonRepository<Emulator> emu_repo_;
-  JsonHistoryRepository history_repo_;
+	JsonRepository<Game> game_repo_;
+	JsonRepository<Emulator> emu_repo_;
+	JsonHistoryRepository history_repo_;
 };
 
 }
-
-#endif
