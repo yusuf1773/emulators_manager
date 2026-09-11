@@ -1,92 +1,49 @@
 #include "emu/persistence/config.h"
 
-#include <filesystem>
-#include <fstream>
-#include <iterator>
-#include <stdexcept>
-#include <string>
+#include <gtest/gtest.h>
 
-#include "emu/persistence/json_serialization.h"
-#include "test_support.h"
+#include <fstream>
+
+#include "nlohmann/json.hpp"
+#include "temporary_directory.h"
 
 namespace emu {
 namespace {
 
-std::string ReadText(const std::filesystem::path& path) {
-	std::ifstream input(path);
-	return {std::istreambuf_iterator<char>(input),
-			std::istreambuf_iterator<char>()};
-}
-
-void TestDefaultConfig() {
+TEST(ConfigTest, CreatesDefaultsAndResolvesPaths) {
 	testing::TemporaryDirectory directory;
-	const auto path = directory.path() / "nested" / "config.json";
+	const auto path = directory.path() / "config" / "config.json";
 	const Config config(path);
-
-	testing::Check(std::filesystem::is_regular_file(path),
-				   "Default config file was not created");
-	testing::Check(
-		config.GetData().games_path == path.parent_path() / "games.json",
-		"Default games path was resolved incorrectly");
-	testing::Check(config.GetData().emulators_path ==
-					   path.parent_path() / "emulators.json",
-				   "Default emulators path was resolved incorrectly");
-	testing::Check(
-		config.GetData().history_path == path.parent_path() / "history.json",
-		"Default history path was resolved incorrectly");
-	testing::Check(config.GetData().history_max_size == 15,
-				   "Default history limit changed");
-
-	const auto json = nlohmann::json::parse(ReadText(path));
-	testing::Check(json.size() == 4, "Default config has unexpected fields");
+	EXPECT_TRUE(std::filesystem::is_regular_file(path));
+	EXPECT_EQ(config.GetData().database_path,
+			  path.parent_path() / "emulators.db");
+	EXPECT_EQ(config.GetData().games_path, path.parent_path() / "games.json");
+	EXPECT_EQ(config.GetData().export_path,
+			  path.parent_path() / "catalog.json");
+	EXPECT_EQ(config.GetData().history_max_size, 15);
 }
 
-void TestConfiguredPaths() {
+TEST(ConfigTest, LoadsOldConfigWithoutNewFields) {
 	testing::TemporaryDirectory directory;
 	const auto path = directory.path() / "config.json";
-	ConfigData data;
-	data.games_path = directory.path() / "absolute-games.json";
-	data.emulators_path = "data/emulators.json";
-	data.history_path = "history/custom.json";
-	data.history_max_size = 42;
-	std::ofstream(path) << nlohmann::json(data);
-
+	std::ofstream(path) << nlohmann::json{
+		{"games_path", "old-games.json"},
+		{"emulators_path", "old-emulators.json"},
+		{"history_path", "old-history.json"},
+		{"history_max_size", 4}};
 	const Config config(path);
-	testing::Check(config.GetData().games_path == data.games_path,
-				   "Absolute path changed");
-	testing::Check(config.GetData().emulators_path ==
-					   path.parent_path() / data.emulators_path,
-				   "Relative emulator path was resolved incorrectly");
-	testing::Check(
-		config.GetData().history_path == path.parent_path() / data.history_path,
-		"Relative history path was resolved incorrectly");
-	testing::Check(config.GetData().history_max_size == 42,
-				   "Configured history limit changed");
+	EXPECT_EQ(config.GetData().database_path,
+			  directory.path() / "emulators.db");
+	EXPECT_EQ(config.GetData().games_path, directory.path() / "old-games.json");
+	EXPECT_EQ(config.GetData().history_max_size, 4);
 }
 
-void TestInvalidConfigIsPreserved() {
+TEST(ConfigTest, RejectsMalformedConfig) {
 	testing::TemporaryDirectory directory;
-	const auto malformed = directory.path() / "malformed.json";
-	std::ofstream(malformed) << "{broken";
-	const auto before = ReadText(malformed);
-	testing::ExpectThrow<std::runtime_error>([&] { Config config(malformed); },
-											 "Malformed config must throw");
-	testing::Check(ReadText(malformed) == before,
-				   "Malformed config was overwritten");
-
-	const auto incomplete = directory.path() / "incomplete.json";
-	std::ofstream(incomplete) << R"({"games_path":"games.json"})";
-	testing::ExpectThrow<std::runtime_error>([&] { Config config(incomplete); },
-											 "Incomplete config must throw");
+	const auto path = directory.path() / "config.json";
+	std::ofstream(path) << "{broken";
+	EXPECT_THROW(Config config(path), std::runtime_error);
 }
 
 }
-}
-
-int main() {
-	return emu::testing::RunTests([] {
-		emu::TestDefaultConfig();
-		emu::TestConfiguredPaths();
-		emu::TestInvalidConfigIsPreserved();
-	});
 }

@@ -1,19 +1,18 @@
 #pragma once
 
 #include "cli/commands/cli_command.h"
-#include "emu/application/repository.h"
-#include "emu/domain/emulator.h"
+#include "emu/application/emulator_service.h"
 
 namespace emu {
 
 class ListEmulatorsCommand : public CliCommand {
-	public:
-	explicit ListEmulatorsCommand(const Repository<Emulator>& emu_repo);
+public:
+	explicit ListEmulatorsCommand(const EmulatorService& service);
 	void Execute() override;
 	void Register(CLI::App& app) override;
 
-	private:
-	const Repository<Emulator>& emu_repo_;
+private:
+	const EmulatorService& service_;
 };
 
 }

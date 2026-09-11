@@ -1,29 +1,14 @@
 #pragma once
 
 #include <filesystem>
-#include <iostream>
 #include <random>
 #include <stdexcept>
 #include <string>
 
 namespace emu::testing {
 
-inline void Check(bool condition, const std::string& message) {
-	if (!condition) throw std::runtime_error(message);
-}
-
-template <typename Exception, typename Function>
-void ExpectThrow(Function function, const std::string& message) {
-	try {
-		function();
-	} catch (const Exception&) {
-		return;
-	}
-	throw std::runtime_error(message);
-}
-
 class TemporaryDirectory {
-	public:
+public:
 	TemporaryDirectory() {
 		std::random_device random;
 		for (int attempt = 0; attempt < 100; ++attempt) {
@@ -44,19 +29,8 @@ class TemporaryDirectory {
 
 	const std::filesystem::path& path() const { return path_; }
 
-	private:
+private:
 	std::filesystem::path path_;
 };
-
-template <typename Function>
-int RunTests(Function function) {
-	try {
-		function();
-		return 0;
-	} catch (const std::exception& error) {
-		std::cerr << error.what() << '\n';
-		return 1;
-	}
-}
 
 }

@@ -11,7 +11,7 @@
 namespace emu {
 
 class CommandManager {
-	public:
+public:
 	template <typename Command, typename... Args>
 		requires std::derived_from<Command, Command> &&
 				 std::constructible_from<Command, Args&&...>
@@ -24,7 +24,7 @@ class CommandManager {
 
 	void RunSelected() const;
 
-	private:
+private:
 	std::vector<std::unique_ptr<Command>> commands_;
 };
 

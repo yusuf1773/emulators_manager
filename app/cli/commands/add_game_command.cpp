@@ -3,14 +3,23 @@
 #include <utility>
 
 #include "CLI/App.hpp"
+#include "cli/result.h"
 
 namespace emu {
 
-AddGameCommand::AddGameCommand(Repository<Game>& repo) : repo_(repo) {}
+AddGameCommand::AddGameCommand(GameService& service) : service_(service) {}
 
 void AddGameCommand::Execute() {
-	repo_.Add(Game{std::move(name_), std::move(path_), std::move(platform_)},
-			  allow_replace_);
+	if (allow_replace_) {
+		auto existing = Require(service_.FindByName(name_));
+		if (existing) {
+			Require(service_.Update(existing->id, std::move(name_),
+									std::move(path_), std::move(platform_)));
+			return;
+		}
+	}
+	Require(service_.Create(std::move(name_), std::move(path_),
+							std::move(platform_)));
 }
 
 void AddGameCommand::Register(CLI::App& app) {

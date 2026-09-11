@@ -1,28 +1,34 @@
 #include "bootstrap/app_context.h"
 
-#include <string>
+#include <stdexcept>
 #include <utility>
 
 namespace emu {
+namespace {
 
-AppContext::AppContext(ConfigData config)
-	: config_data_(std::move(config)),
-	  game_repo_(
-		  config_data_.games_path,
-		  [](const Game& game) -> const std::string& { return game.name; }),
-	  emu_repo_(
-		  config_data_.emulators_path,
-		  [](const Emulator& emu) -> const std::string& { return emu.name; }),
-	  history_repo_(config_data_.history_path, config_data_.history_max_size) {}
-
-JsonRepository<Game>& AppContext::GetGameRepo() { return game_repo_; }
-
-JsonRepository<Emulator>& AppContext::GetEmulatorsRepo() { return emu_repo_; }
-
-JsonHistoryRepository& AppContext::GetCommandsHistoryRepo() {
-	return history_repo_;
+void Require(const Result<void>& result) {
+	if (!result) throw std::runtime_error(result.error().message);
 }
 
-const ConfigData& AppContext::GetConfig() const { return config_data_; }
+}
+
+AppContext::AppContext(ConfigData config)
+	: config_(std::move(config)),
+	  database_(config_.database_path),
+	  game_repository_(database_),
+	  emulator_repository_(database_),
+	  profile_repository_(database_),
+	  history_repository_(database_),
+	  game_service_(game_repository_, id_generator_),
+	  emulator_service_(emulator_repository_, id_generator_),
+	  profile_service_(profile_repository_, game_repository_,
+					   emulator_repository_, id_generator_),
+	  catalog_transfer_(game_repository_, emulator_repository_,
+						profile_repository_, game_service_, emulator_service_,
+						profile_service_) {
+	Require(history_repository_.Trim(config_.history_max_size));
+	Require(catalog_transfer_.ImportLegacyIfEmpty(config_.games_path,
+												  config_.emulators_path));
+}
 
 }

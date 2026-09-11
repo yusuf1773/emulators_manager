@@ -5,7 +5,7 @@
 #include <stdexcept>
 #include <utility>
 
-#include "emu/persistence/json_serialization.h"
+#include "nlohmann/json.hpp"
 
 namespace emu {
 
@@ -26,7 +26,9 @@ Config::Config(std::filesystem::path path) : path_(std::move(path)) {
 
 	Load();
 
+	data_.database_path = ResolvePath(path_, data_.database_path);
 	data_.emulators_path = ResolvePath(path_, data_.emulators_path);
+	data_.export_path = ResolvePath(path_, data_.export_path);
 	data_.games_path = ResolvePath(path_, data_.games_path);
 	data_.history_path = ResolvePath(path_, data_.history_path);
 }
@@ -42,7 +44,13 @@ void Config::Load() {
 		nlohmann::json j;
 		in >> j;
 
-		data_ = j.get<ConfigData>();
+		data_.database_path = j.value("database_path", data_.database_path);
+		data_.games_path = j.value("games_path", data_.games_path);
+		data_.emulators_path = j.value("emulators_path", data_.emulators_path);
+		data_.export_path = j.value("export_path", data_.export_path);
+		data_.history_path = j.value("history_path", data_.history_path);
+		data_.history_max_size =
+			j.value("history_max_size", data_.history_max_size);
 	} catch (const nlohmann::json::exception& e) {
 		throw std::runtime_error("Invalid config " + path_.string() + ": " +
 								 e.what());
@@ -63,7 +71,12 @@ void Config::SaveDefault() {
 	}
 
 	ConfigData defaults;
-	nlohmann::json j = defaults;
+	nlohmann::json j{{"database_path", defaults.database_path},
+					 {"games_path", defaults.games_path},
+					 {"emulators_path", defaults.emulators_path},
+					 {"export_path", defaults.export_path},
+					 {"history_path", defaults.history_path},
+					 {"history_max_size", defaults.history_max_size}};
 
 	try {
 		out << j.dump(4);

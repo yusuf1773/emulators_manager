@@ -6,13 +6,13 @@
 namespace emu {
 
 class ListLaunchStrategiesCommand : public CliCommand {
-	public:
+public:
 	explicit ListLaunchStrategiesCommand(
 		const LaunchStrategyRegistry& strategy_manager);
 	void Execute() override;
 	void Register(CLI::App& app) override;
 
-	private:
+private:
 	const LaunchStrategyRegistry& strategies_manager_;
 };
 

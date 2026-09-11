@@ -14,7 +14,7 @@
 namespace emu {
 
 class LaunchStrategyRegistry {
-	public:
+public:
 	template <typename Strategy, typename... Args>
 		requires std::derived_from<Strategy, LaunchStrategy> &&
 				 std::constructible_from<Strategy, Args&&...>
@@ -25,7 +25,7 @@ class LaunchStrategyRegistry {
 	const LaunchStrategy& GetById(std::string_view id) const;
 	const std::vector<std::unique_ptr<LaunchStrategy>>& GetAll() const;
 
-	private:
+private:
 	void AddStrategy(std::unique_ptr<LaunchStrategy> strategy);
 	std::vector<std::unique_ptr<LaunchStrategy>> strategies_;
 };

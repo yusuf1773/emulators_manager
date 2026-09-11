@@ -4,7 +4,7 @@
 namespace emu {
 
 class Command {
-	public:
+public:
 	virtual ~Command() = default;
 	virtual void Register(CLI::App& app) = 0;
 	virtual void Execute() = 0;
@@ -12,10 +12,10 @@ class Command {
 };
 
 class CliCommand : public Command {
-	public:
+public:
 	bool IsSelected() const override;
 
-	protected:
+protected:
 	CLI::App* command_ = nullptr;
 };
 

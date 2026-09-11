@@ -5,37 +5,40 @@
 #include <string>
 
 #include "CLI/App.hpp"
+#include "cli/result.h"
 #include "cli/table.h"
 
 namespace emu {
 
-ListEmulatorsCommand::ListEmulatorsCommand(const Repository<Emulator>& emu_repo)
-	: emu_repo_(emu_repo) {}
+ListEmulatorsCommand::ListEmulatorsCommand(const EmulatorService& service)
+	: service_(service) {}
 
 void ListEmulatorsCommand::Register(CLI::App& app) {
 	command_ = app.add_subcommand("list-emu", "Emulators list");
 }
 
 void ListEmulatorsCommand::Execute() {
-	auto emus = emu_repo_.GetAll();
-
-	if (emus.empty()) {
+	const auto emulators = Require(service_.List());
+	if (emulators.empty()) {
 		std::cout << "Emulators not found" << std::endl;
 		return;
 	}
-
-	Table<Emulator> table_emus{
-		{"Name", [](const Emulator& e) { return e.name; }},
-		{"Platform", [](const Emulator& e) { return e.platform; }},
-		{"Path", [](const Emulator& e) { return e.path.string(); }},
-		{"Strategy ID", [](const Emulator& e) { return e.launch_strategy_id; }},
-		{"Arguments", [](const Emulator& e) {
-			 return e.args.empty() ? ""
-								   : e.args | std::views::join_with(' ') |
-										 std::ranges::to<std::string>();
+	Table<Emulator> table{
+		{"Id", [](const Emulator& emulator) { return emulator.id.value(); }},
+		{"Name", [](const Emulator& emulator) { return emulator.name; }},
+		{"Platform",
+		 [](const Emulator& emulator) { return emulator.platform; }},
+		{"Path",
+		 [](const Emulator& emulator) {
+			 return emulator.executable_path.string();
+		 }},
+		{"Arguments", [](const Emulator& emulator) {
+			 return emulator.base_arguments.empty()
+						? ""
+						: emulator.base_arguments | std::views::join_with(' ') |
+							  std::ranges::to<std::string>();
 		 }}};
-
-	table_emus.Print(emus);
+	table.Print(emulators);
 }
 
 }

@@ -7,9 +7,10 @@
 namespace emu {
 
 class LaunchStrategy {
-	public:
+public:
 	virtual ~LaunchStrategy() = default;
-	virtual LaunchRequest BuildRequest(const LaunchContext& context) const = 0;
+	virtual Result<LaunchRequest> BuildRequest(
+		const LaunchContext& context) const = 0;
 	virtual LaunchStrategyInfo Info() const = 0;
 };
 

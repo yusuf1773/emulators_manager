@@ -1,16 +1,21 @@
 #include "cli/commands/replace_game_command.h"
 
+#include <stdexcept>
 #include <utility>
 
 #include "CLI/App.hpp"
+#include "cli/result.h"
 
 namespace emu {
 
-ReplaceGameCommand::ReplaceGameCommand(Repository<Game>& repo) : repo_(repo) {}
+ReplaceGameCommand::ReplaceGameCommand(GameService& service)
+	: service_(service) {}
 
 void ReplaceGameCommand::Execute() {
-	repo_.Replace(old_name_, Game{std::move(name_), std::move(path_),
-								  std::move(platform_)});
+	auto existing = Require(service_.FindByName(old_name_));
+	if (!existing) throw std::runtime_error("Game not found");
+	Require(service_.Update(existing->id, std::move(name_), std::move(path_),
+							std::move(platform_)));
 }
 
 void ReplaceGameCommand::Register(CLI::App& app) {

@@ -5,19 +5,21 @@
 #include <iostream>
 
 #include "CLI/App.hpp"
+#include "cli/result.h"
 #include "cli/table.h"
 
 namespace emu {
 
-ListCmdHistoryCommand::ListCmdHistoryCommand(HistoryRepository& history_repo)
-	: history_repo_(history_repo) {}
+ListCmdHistoryCommand::ListCmdHistoryCommand(HistoryRepository& history_repo,
+											 std::size_t limit)
+	: history_repo_(history_repo), limit_(limit) {}
 
 void ListCmdHistoryCommand::Register(CLI::App& app) {
 	command_ = app.add_subcommand("list-history", "History list");
 }
 
 void ListCmdHistoryCommand::Execute() {
-	auto& histories = history_repo_.GetHistories();
+	const auto histories = Require(history_repo_.FindRecent(limit_));
 
 	if (histories.empty()) {
 		std::cout << "History is empty" << std::endl;

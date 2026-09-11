@@ -6,8 +6,9 @@
 namespace emu {
 
 class DirectLaunchStrategy : public LaunchStrategy {
-	public:
-	LaunchRequest BuildRequest(const LaunchContext& context) const override;
+public:
+	Result<LaunchRequest> BuildRequest(
+		const LaunchContext& context) const override;
 	LaunchStrategyInfo Info() const override;
 };
 

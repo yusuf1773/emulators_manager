@@ -43,7 +43,7 @@ inline constexpr TableStyle kSimple{" ", " ", " ", " ", " ", " ",
 
 template <typename T>
 class Table {
-	public:
+public:
 	using ColumnType =
 		std::pair<std::string_view, std::function<std::string(const T&)>>;
 
@@ -113,7 +113,7 @@ class Table {
 					style.bottom_right, style);
 	}
 
-	private:
+private:
 	void PrintHeader(const std::vector<int>& widths, TableStyle style) const {
 		std::cout << style.vertical << ' ' << std::left
 				  << std::setw(widths[0] - 1) << "Ind";
@@ -151,7 +151,7 @@ class Table {
 		std::cout << '\n';
 	}
 
-	private:
+private:
 	std::vector<ColumnType> getters_;
 };
 

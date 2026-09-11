@@ -7,12 +7,12 @@
 namespace emu {
 
 class Config {
-	public:
+public:
 	explicit Config(std::filesystem::path path);
 
 	const ConfigData& GetData() const;
 
-	private:
+private:
 	void Load();
 	void SaveDefault();
 

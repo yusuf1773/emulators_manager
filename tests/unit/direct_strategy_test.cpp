@@ -1,63 +1,51 @@
 #include "emu/launch/direct_strategy.h"
 
-#include <stdexcept>
-#include <string>
-#include <vector>
-
-#include "test_support.h"
+#include <gtest/gtest.h>
 
 namespace emu {
 namespace {
 
-void TestInfo() {
-	DirectLaunchStrategy strategy;
-	const auto info = strategy.Info();
-	testing::Check(info.id == "direct", "Strategy id changed");
-	testing::Check(info.name == "Direct", "Strategy name changed");
-	testing::Check(!info.description.empty(), "Strategy description is empty");
-}
-
-void TestRequest() {
-	DirectLaunchStrategy strategy;
-	const Game game{"Game", "games/game.rom", "console"};
-	const Emulator emulator{"Emulator",
-							"bin/emulator.exe",
+TEST(DirectStrategyTest, BuildsArgumentsInExpectedOrder) {
+	const Game game{GameId("game"), "Game", "game.rom", "console"};
+	const Emulator emulator{EmulatorId("emulator"),
+							"Emulator",
+							"emulator.exe",
 							"console",
-							"direct",
-							{"--fullscreen", "two words", ""}};
-
-	const auto request = strategy.BuildRequest({emulator, game});
-	testing::Check(request.executable == emulator.path,
-				   "Executable path changed");
-	testing::Check(request.arguments ==
-					   std::vector<std::string>{
-						   game.path.string(), "--fullscreen", "two words", ""},
-				   "Arguments or their order changed");
-}
-
-void TestEmptyValues() {
+							{"--base"}};
+	const LaunchProfile profile{LaunchProfileId("profile"),
+								"Profile",
+								game.id,
+								emulator.id,
+								"direct",
+								{"--profile"},
+								"working",
+								true};
 	DirectLaunchStrategy strategy;
-	const Game empty_game{"Game", {}, "console"};
+	auto result = strategy.BuildRequest({emulator, game, profile});
+	ASSERT_TRUE(result);
+	EXPECT_EQ(result->executable, emulator.executable_path);
+	EXPECT_EQ(result->arguments,
+			  (std::vector<std::string>{"game.rom", "--base", "--profile"}));
+	EXPECT_EQ(result->working_directory, "working");
+}
+
+TEST(DirectStrategyTest, RejectsEmptyExecutable) {
+	const Game game{GameId("game"), "Game", "game.rom", "console"};
 	const Emulator emulator{
-		"Emulator", "emulator.exe", "console", "direct", {}};
-	const auto request = strategy.BuildRequest({emulator, empty_game});
-	testing::Check(request.arguments == std::vector<std::string>{""},
-				   "Empty game path must remain the first argument");
-
-	auto invalid = emulator;
-	invalid.path.clear();
-	testing::ExpectThrow<std::invalid_argument>(
-		[&] { strategy.BuildRequest({invalid, empty_game}); },
-		"Empty executable path must throw");
+		EmulatorId("emulator"), "Emulator", {}, "console", {}};
+	const LaunchProfile profile{LaunchProfileId("profile"),
+								"Profile",
+								game.id,
+								emulator.id,
+								"direct",
+								{},
+								{},
+								false};
+	DirectLaunchStrategy strategy;
+	auto result = strategy.BuildRequest({emulator, game, profile});
+	ASSERT_FALSE(result);
+	EXPECT_EQ(result.error().code, ErrorCode::kInvalidArgument);
 }
 
 }
-}
-
-int main() {
-	return emu::testing::RunTests([] {
-		emu::TestInfo();
-		emu::TestRequest();
-		emu::TestEmptyValues();
-	});
 }

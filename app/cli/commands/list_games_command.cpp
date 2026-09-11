@@ -3,31 +3,31 @@
 #include <iostream>
 
 #include "CLI/App.hpp"
+#include "cli/result.h"
 #include "cli/table.h"
 
 namespace emu {
 
-ListGamesCommand::ListGamesCommand(const Repository<Game>& game_repo)
-	: game_repo_(game_repo) {}
+ListGamesCommand::ListGamesCommand(const GameService& service)
+	: service_(service) {}
 
 void ListGamesCommand::Register(CLI::App& app) {
 	command_ = app.add_subcommand("list-game", "Show list of games");
 }
 
 void ListGamesCommand::Execute() {
-	const auto& games = game_repo_.GetAll();
-
+	const auto games = Require(service_.List());
 	if (games.empty()) {
 		std::cout << "Games not found" << std::endl;
 		return;
 	}
-
-	Table<Game> games_table{
-		{{"Name", [](const Game& g) { return g.name; }},
-		 {"Platform", [](const Game& g) { return g.platform; }},
-		 {"Path", [](const Game& g) { return g.path.string(); }}}};
-
-	games_table.Print(games);
+	Table<Game> table{
+		{{"Id", [](const Game& game) { return game.id.value(); }},
+		 {"Name", [](const Game& game) { return game.name; }},
+		 {"Platform", [](const Game& game) { return game.platform; }},
+		 {"Path",
+		  [](const Game& game) { return game.content_path.string(); }}}};
+	table.Print(games);
 }
 
 }

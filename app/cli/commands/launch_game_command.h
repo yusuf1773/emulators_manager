@@ -8,15 +8,14 @@
 namespace emu {
 
 class LaunchGameCommand : public CliCommand {
-	public:
+public:
 	explicit LaunchGameCommand(LaunchGameService& service);
 	void Execute() override;
 	void Register(CLI::App& app) override;
 
-	private:
+private:
 	LaunchGameService& service_;
-	std::string game_name_;
-	std::string emu_name_;
+	std::string profile_id_;
 };
 
 }
