@@ -11,6 +11,8 @@ add_library(emu_gui_adapter STATIC
 	gui_app_context.h
 	models/emulator_list_model.cpp
 	models/emulator_list_model.h
+	models/launch_profile_list_model.cpp
+	models/launch_profile_list_model.h
 	models/game_list_model.cpp
 	models/game_list_model.h
 )
@@ -34,6 +36,7 @@ qt_add_qml_module(emu_manager_gui
 	VERSION 1.0
 	QML_FILES
 		qml/Main.qml
+		qml/ProfilesDialog.qml
 )
 
 target_link_libraries(emu_manager_gui PRIVATE

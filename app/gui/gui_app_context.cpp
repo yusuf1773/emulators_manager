@@ -19,7 +19,8 @@ GuiAppContext::GuiAppContext(const std::filesystem::path& config_path)
 						profile_repository_, game_service_, emulator_service_,
 						profile_service_),
 	  game_list_model_(game_service_, errors_),
-	  emulator_list_model_(emulator_service_, errors_) {
+	  emulator_list_model_(emulator_service_, errors_),
+	  profile_list_model_(profile_service_, errors_) {
 	if (auto result = history_repository_.Trim(config_.history_max_size);
 		!result) {
 		errors_.Present(result.error());

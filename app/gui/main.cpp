@@ -21,8 +21,12 @@ int main(int argc, char* argv[]) {
 									   QQmlEngine::CppOwnership);
 		QQmlEngine::setObjectOwnership(&context.emulator_list_model(),
 									   QQmlEngine::CppOwnership);
+		QQmlEngine::setObjectOwnership(&context.profile_list_model(),
+									   QQmlEngine::CppOwnership);
 		engine.setInitialProperties(
-			{{QStringLiteral("emulatorListModel"),
+			{{QStringLiteral("profileListModel"),
+			  QVariant::fromValue(&context.profile_list_model())},
+			 {QStringLiteral("emulatorListModel"),
 			  QVariant::fromValue(&context.emulator_list_model())},
 			 {QStringLiteral("gameListModel"),
 			  QVariant::fromValue(&context.game_list_model())},

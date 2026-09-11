@@ -9,6 +9,7 @@
 #include "error_notifier.h"
 #include "fakes.h"
 #include "models/emulator_list_model.h"
+#include "models/launch_profile_list_model.h"
 
 namespace emu {
 namespace {
@@ -18,6 +19,7 @@ class GameListModelTest : public QObject {
 
 private slots:
 	void ExposesGameRoles();
+	void ProfileLifecycle();
 	void EmulatorPersistenceAndArguments();
 	void SavesAndRemovesPersistentGames();
 	void RejectsFailedChanges();
@@ -141,6 +143,73 @@ void GameListModelTest::EmulatorPersistenceAndArguments() {
 	SqliteDatabase database(path);
 	SqliteEmulatorRepository repository(database);
 	QVERIFY(repository.FindAll()->empty());
+}
+
+void GameListModelTest::ProfileLifecycle() {
+	QTemporaryDir directory;
+	QVERIFY(directory.isValid());
+	const auto path =
+		std::filesystem::path(directory.path().toStdString()) / "profiles.db";
+	{
+		SqliteDatabase database(path);
+		SqliteGameRepository games(database);
+		SqliteEmulatorRepository emulators(database);
+		SqliteLaunchProfileRepository profiles(database);
+		QVERIFY(games.Save({GameId("game"), "Game", "game.rom", "NES"}));
+		QVERIFY(games.Save({GameId("other"), "Other", "other.rom", "NES"}));
+		QVERIFY(emulators.Save(
+			{EmulatorId("emu"), "Emulator", "emu.exe", "NES", {}}));
+		testing::FixedIdGenerator ids({"one", "two"});
+		LaunchProfileService service(profiles, games, emulators, ids);
+		ErrorNotifier errors;
+		LaunchProfileListModel model(service, errors);
+		QVERIFY(model.SelectGame("game"));
+		QSignalSpy reset(&model, &QAbstractItemModel::modelReset);
+		QVERIFY(model.Save("", "First", "emu", "direct",
+						   {"a b", "--fullscreen"}, "work dir", true));
+		QVERIFY(model.Save("", "Second", "emu", "direct", {}, "", true));
+		QCOMPARE(model.count(), 2);
+		QVERIFY(reset.count() >= 2);
+		QVERIFY(model.SetDefault("one"));
+		int defaults = 0;
+		for (int row = 0; row < model.count(); ++row) {
+			const auto value = model.Get(row);
+			if (value.value("isDefault").toBool()) {
+				++defaults;
+				QCOMPARE(value.value("profileId").toString(), QString("one"));
+			}
+		}
+		QCOMPARE(defaults, 1);
+		QVERIFY(!model.Save("", "Invalid", "missing", "direct", {}, "", false));
+		QVERIFY(!model.Save("", "Invalid", "emu", "unknown", {}, "", false));
+		QCOMPARE(model.count(), 2);
+		QVERIFY(model.SelectGame("other"));
+		QCOMPARE(model.count(), 0);
+		QVERIFY(!model.Save("one", "Moved", "emu", "direct", {}, "", true));
+		QVERIFY(!model.Remove("one"));
+	}
+	{
+		SqliteDatabase database(path);
+		SqliteGameRepository games(database);
+		SqliteEmulatorRepository emulators(database);
+		SqliteLaunchProfileRepository profiles(database);
+		testing::FixedIdGenerator ids({});
+		LaunchProfileService service(profiles, games, emulators, ids);
+		ErrorNotifier errors;
+		LaunchProfileListModel model(service, errors);
+		QVERIFY(model.SelectGame("game"));
+		QCOMPARE(model.count(), 2);
+		auto first = service.FindById(LaunchProfileId("one"));
+		QVERIFY(first && *first);
+		QVERIFY((*first)->is_default);
+		QCOMPARE((*first)->arguments.size(), std::size_t(2));
+		QCOMPARE((*first)->arguments[0], std::string("a b"));
+		QVERIFY(model.Remove("two"));
+		QCOMPARE(model.count(), 1);
+		QVERIFY(emulators.Remove(EmulatorId("emu")));
+		QVERIFY(model.SelectGame("game"));
+		QCOMPARE(model.count(), 0);
+	}
 }
 
 void GameListModelTest::ExposesGameRoles() {

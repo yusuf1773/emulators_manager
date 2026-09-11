@@ -13,6 +13,7 @@
 #include "error_notifier.h"
 #include "models/emulator_list_model.h"
 #include "models/game_list_model.h"
+#include "models/launch_profile_list_model.h"
 
 namespace emu {
 
@@ -22,6 +23,7 @@ public:
 
 	GameListModel& game_list_model() { return game_list_model_; }
 	EmulatorListModel& emulator_list_model() { return emulator_list_model_; }
+	LaunchProfileListModel& profile_list_model() { return profile_list_model_; }
 	ErrorNotifier& errors() { return errors_; }
 
 private:
@@ -39,6 +41,7 @@ private:
 	ErrorNotifier errors_;
 	GameListModel game_list_model_;
 	EmulatorListModel emulator_list_model_;
+	LaunchProfileListModel profile_list_model_;
 };
 
 }

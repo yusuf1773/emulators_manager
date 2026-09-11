@@ -7,6 +7,7 @@ import QtQuick.Dialogs
 
 ApplicationWindow {
 	id: window
+	required property var profileListModel
 	required property var gameListModel
 	required property var emulatorListModel
 	property bool emulatorMode: navigation.currentIndex === 1
@@ -111,6 +112,11 @@ ApplicationWindow {
 						}
 					}
 					Button {
+						visible: !window.emulatorMode
+						text: qsTr("Профили")
+						onClicked: profilesDialog.openFor(row.model.id, row.model.name)
+					}
+					Button {
 						text: qsTr("Изменить")
 						onClicked: window.editGame(row.model.id, row.model.name, row.model.path, row.model.platform, window.emulatorMode ? row.model.arguments : [])
 					}
@@ -200,4 +206,11 @@ ApplicationWindow {
 		}
 		onAccepted: window.catalogModel.Remove(gameId)
 	}
+	ProfilesDialog {
+		id: profilesDialog
+		profiles: window.profileListModel
+		emulators: window.emulatorListModel
+		errors: window.errorNotifier
+	}
+
 }
