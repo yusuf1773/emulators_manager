@@ -3,6 +3,7 @@ project(emu_manager LANGUAGES C CXX)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 option(EMU_BUILD_CLI "Build the command-line application" ON)
+option(EMU_BUILD_GUI "Build the Qt graphical application" OFF)
 option(EMU_BUILD_PERSISTENCE "Build SQLite persistence and JSON transfer" ON)
 
 if(EMU_BUILD_CLI AND NOT EMU_BUILD_PERSISTENCE)
@@ -54,4 +55,8 @@ endif()
 
 if(BUILD_TESTING)
 	add_subdirectory(tests)
+endif()
+
+if(EMU_BUILD_GUI)
+	add_subdirectory(app/gui)
 endif()

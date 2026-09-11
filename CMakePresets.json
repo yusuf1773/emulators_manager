@@ -32,6 +32,13 @@
 			}
 		},
 		{
+			"name": "gui",
+			"inherits": "debug",
+			"cacheVariables": {
+				"EMU_BUILD_GUI": "ON"
+			}
+		},
+		{
 			"name": "ci-linux",
 			"inherits": "base",
 			"cacheVariables": {
@@ -49,6 +56,7 @@
 	"buildPresets": [
 		{"name": "debug", "configurePreset": "debug"},
 		{"name": "core", "configurePreset": "core"},
+		{"name": "gui", "configurePreset": "gui"},
 		{"name": "ci-linux", "configurePreset": "ci-linux"},
 		{"name": "ci-windows", "configurePreset": "ci-windows"}
 	],
@@ -61,6 +69,11 @@
 		{
 			"name": "core",
 			"configurePreset": "core",
+			"output": {"outputOnFailure": true}
+		},
+		{
+			"name": "gui",
+			"configurePreset": "gui",
 			"output": {"outputOnFailure": true}
 		},
 		{

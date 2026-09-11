@@ -50,3 +50,7 @@ if(EMU_BUILD_CLI)
 		FetchContent_MakeAvailable(CLI11)
 	endif()
 endif()
+
+if(EMU_BUILD_GUI)
+	find_package(Qt6 6.5 REQUIRED COMPONENTS Core Gui Qml Quick QuickControls2)
+endif()
