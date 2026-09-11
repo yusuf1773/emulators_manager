@@ -1,46 +1,48 @@
 cmake_minimum_required(VERSION 3.20)
-
 project(emu_manager LANGUAGES CXX)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
-set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+option(EMU_BUILD_CLI "Build the command-line application" ON)
+option(EMU_BUILD_PERSISTENCE "Build JSON persistence" ON)
 
-include(FetchContent)
+if(EMU_BUILD_CLI AND NOT EMU_BUILD_PERSISTENCE)
+  message(FATAL_ERROR "The CLI requires EMU_BUILD_PERSISTENCE=ON")
+endif()
 
-FetchContent_Declare(
-    CLI11
-    GIT_REPOSITORY https://github.com/CLIUtils/CLI11.git
-    GIT_TAG v2.5.0
-    GIT_SHALLOW TRUE
+include(CTest)
+include(cmake/dependencies.cmake)
+
+add_library(emu_domain INTERFACE)
+target_compile_features(emu_domain INTERFACE cxx_std_23)
+target_include_directories(emu_domain INTERFACE "${PROJECT_SOURCE_DIR}/include")
+
+add_library(emu_application
+  src/application/launch_game_service.cc
+  src/application/launch_strategy_registry.cc
 )
+target_link_libraries(emu_application PUBLIC emu_domain)
 
-FetchContent_Declare(
-    json
-    URL https://github.com/nlohmann/json/releases/download/v3.12.0/json.tar.xz
+add_library(emu_launch
+  src/launch/direct_strategy.cc
+  src/launch/system_process_runner.cc
 )
+target_link_libraries(emu_launch PUBLIC emu_application)
 
-FetchContent_MakeAvailable(json)
-
-FetchContent_MakeAvailable(CLI11)
-
-add_subdirectory(src/launch_strategy)
-add_subdirectory(src/app_config)
-add_subdirectory(src/app_context)
-add_subdirectory(src/comand)
-add_subdirectory(src/comand_manager)
-add_subdirectory(src/application)
-
-add_executable(emu_manager
-    src/main.cpp
-)
-
-target_link_libraries(emu_manager PUBLIC
-    application
-    comand_manager
-    app_context
-    config
-    comands
-    strategy
+if(EMU_BUILD_PERSISTENCE)
+  add_library(emu_persistence
+    src/persistence/config.cc
+    src/persistence/file_io.cc
+  )
+  target_link_libraries(emu_persistence PUBLIC
+    emu_application
     nlohmann_json::nlohmann_json
-    CLI11::CLI11
-)
+  )
+endif()
+
+if(EMU_BUILD_CLI)
+  add_subdirectory(app)
+endif()
+
+if(BUILD_TESTING)
+  add_subdirectory(tests)
+endif()
